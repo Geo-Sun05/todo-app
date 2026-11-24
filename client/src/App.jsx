@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
+import { User, Plus } from "lucide-react";
 import { getTasks, createTask, updateTask, deleteTask } from "./api";
 import TaskForm from "./components/TaskForm";
 import TaskCard from "./components/TaskCard";
+import StatCard from "./components/StatCard";
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     getTasks()
@@ -54,24 +57,43 @@ export default function App() {
   const completed = tasks.filter((t) => t.completed);
 
   return (
-    <div>
-      {error && <p style={{ color: "red" }}>Erreur : {error}</p>}
+    <div className="mx-auto max-w-4xl px-6 py-8">
+      <header className="flex items-center gap-3">
+        <User size={24} />
+        <h1 className="text-2xl font-bold">Mes tâches</h1>
+      </header>
 
-      <TaskForm onAdd={handleAdd} />
+      {error && (
+        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          Erreur : {error}
+        </p>
+      )}
 
-      <p>
-        Total : {tasks.length} | En attente : {pending.length} | Terminées : {completed.length}
-      </p>
+      <button
+        onClick={() => setShowForm((v) => !v)}
+        className="mt-6 flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+      >
+        <Plus size={16} />
+        Add New Task
+      </button>
 
-      <h2>Pending Tasks</h2>
-      <ul>
+      {showForm && <TaskForm onAdd={handleAdd} onClose={() => setShowForm(false)} />}
+
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCard label="Total Tasks" value={tasks.length} />
+        <StatCard label="Pending" value={pending.length} color="text-orange-600" />
+        <StatCard label="Completed" value={completed.length} color="text-green-600" />
+      </div>
+
+      <h2 className="mt-8 text-lg font-semibold">Pending Tasks</h2>
+      <ul className="mt-3 space-y-3">
         {pending.map((t) => (
           <TaskCard key={t.id} task={t} onToggle={handleToggle} onEdit={handleEdit} onDelete={handleDelete} />
         ))}
       </ul>
 
-      <h2>Completed Tasks</h2>
-      <ul>
+      <h2 className="mt-8 text-lg font-semibold">Completed Tasks</h2>
+      <ul className="mt-3 space-y-3">
         {completed.map((t) => (
           <TaskCard key={t.id} task={t} onToggle={handleToggle} onEdit={handleEdit} onDelete={handleDelete} />
         ))}

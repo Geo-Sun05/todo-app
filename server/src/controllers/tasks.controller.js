@@ -11,10 +11,13 @@ export async function getTasks(req, res) {
 }
 
 export async function createTask(req, res) {
+
   const { title } = req.body;
+
   if (!title || !title.trim()) {
     return res.status(400).json({ error: "Le titre est obligatoire" });
   }
+
   try {
     const task = await prisma.task.create({ data: { title: title.trim() } });
     res.status(201).json(task);
@@ -25,11 +28,15 @@ export async function createTask(req, res) {
 }
 
 export async function updateTask(req, res) {
+
   const id = Number(req.params.id);
+
   const { title, completed } = req.body;
+
   const data = {};
 
   if (title !== undefined) data.title = title.trim();
+  
   if (completed !== undefined) {
     data.completed = completed;
     data.completedAt = completed ? new Date() : null;
